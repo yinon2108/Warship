@@ -1,0 +1,159 @@
+@startuml
+class com.example.warship.MainActivity {
+# void onCreate(Bundle)
+- void startGame()
+}
+
+class com.example.warship.BoardGame {
++ {static} int BOARD_MY
++ {static} int BOARD_OPP
++ Cell[][] arr
+- int cellSize
+- boolean created
+- Context context
+- int boardType
+# void onSizeChanged(int,int,int,int)
+# void onDraw(Canvas)
++ boolean onTouchEvent(MotionEvent)
++ void clearAll()
++ void setCell(int,int,int)
+}
+
+
+class com.example.warship.FbModule {
+- DatabaseReference root
+- String myId
++ void claimSlot(SlotCallback)
+- void prepareSlot(String,SlotCallback)
++ void clearMySlot(String)
++ void setReady(String,ArrayList<Ship>)
++ void listenBothReady(BothReadyListener)
++ void tryStartGameIfNeeded()
++ void listenState(StateListener)
++ void listenTurn(TurnListener)
++ void listenShot(ShotListener)
++ void listenShotResult(ShotResultListener)
++ void fireShot(String,int,int,long)
++ void sendShotResult(long,boolean)
++ void setTurn(String)
+}
+
+
+interface com.example.warship.FbModule$SlotCallback {
+~ void onSlot(String)
+}
+
+interface com.example.warship.FbModule$BothReadyListener {
+~ void onBothReady(boolean)
+}
+
+interface com.example.warship.FbModule$StateListener {
+~ void onState(String)
+}
+
+interface com.example.warship.FbModule$TurnListener {
+~ void onTurn(String)
+}
+
+class com.example.warship.FbModule$Shot {
++ String by
++ int line
++ int col
++ long seq
+}
+
+class com.example.warship.FbModule$ShotResult {
++ long seq
++ boolean hit
+}
+
+interface com.example.warship.FbModule$ShotListener {
+~ void onShot(Shot)
+}
+
+interface com.example.warship.FbModule$ShotResultListener {
+~ void onShotResult(ShotResult)
+}
+
+class com.example.warship.GameActivity {
+- TextView txtStatus
+- Button btnStart
+- BoardGame myBoard
+- BoardGame oppBoard
+- FbModule fb
+- String mySlot
+- String state
+- String currentTurn
+- boolean lockSetup
+- boolean myReadySent
+- boolean myBoardReady
+- boolean oppBoardReady
+- boolean setupStarted
+- ArrayList<Ship> ships
+- Ship selectedShip
+- int[][] myShots
+- int[][] shotsOnMe
+- long lastShotSeqHandled
+- long pendingSeq
+- int pendingLine
+- int pendingCol
+- int hitsIHit
+- int hitsOnMe
+- boolean gameEnded
+# void onCreate(Bundle)
+- void showEndDialog(boolean)
+# void onDestroy()
++ void onBoardReady(int)
++ void onBoardTouch(int,int,int)
+- void startSetup()
+- void handleSetupTouch(int,int)
+- void redrawMyShips()
+- void handlePlayShot(int,int)
+- void redrawOppShots()
+- void updateStatusText()
+- Ship getShipByCenter(int,int)
+- boolean canShipBeAt(Ship,int,int,String)
+- boolean isCellOfShip(Ship,int,int)
+- boolean isHitOnMyShips(int,int)
+}
+
+
+class com.example.warship.Cell {
++ {static} int Oval
++ {static} int EmptyVal
++ {static} int Hit
++ {static} int Miss
+- int x
+- int cellWidth
+- Bitmap bitmapO
+- int val
+- Paint p
++ void draw(Canvas)
++ boolean isEmpty()
++ void forceSetVal(int)
++ void clear()
+}
+
+
+class com.example.warship.Ship {
++ int centerLine
++ int centerCol
++ String ori
++ void toggleOri()
+}
+
+
+
+
+androidx.appcompat.app.AppCompatActivity <|-- com.example.warship.MainActivity
+android.view.View <|-- com.example.warship.BoardGame
+com.example.warship.FbModule +.. com.example.warship.FbModule$SlotCallback
+com.example.warship.FbModule +.. com.example.warship.FbModule$BothReadyListener
+com.example.warship.FbModule +.. com.example.warship.FbModule$StateListener
+com.example.warship.FbModule +.. com.example.warship.FbModule$TurnListener
+com.example.warship.FbModule +.. com.example.warship.FbModule$Shot
+com.example.warship.FbModule +.. com.example.warship.FbModule$ShotResult
+com.example.warship.FbModule +.. com.example.warship.FbModule$ShotListener
+com.example.warship.FbModule +.. com.example.warship.FbModule$ShotResultListener
+androidx.appcompat.app.AppCompatActivity <|-- com.example.warship.GameActivity
+@enduml

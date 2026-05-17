@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#0D1B2A"
+    android:padding="10dp">
+
+    <TextView
+        android:id="@+id/txtStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Status"
+        android:textColor="#E0E1DD"
+        android:textSize="16sp"
+        android:padding="8dp"
+        android:background="#1B263B"
+        android:gravity="center"
+        android:layout_marginBottom="10dp"/>
+
+    <Button
+        android:id="@+id/btnStart"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="START"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        android:backgroundTint="#415A77"
+        android:layout_marginBottom="10dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Your Board"
+        android:textColor="#E0E1DD"
+        android:textStyle="bold"
+        android:layout_marginBottom="5dp"/>
+
+    <FrameLayout
+        android:id="@+id/myBoardContainer"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="#1B263B"
+        android:layout_marginBottom="10dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Enemy Board"
+        android:textColor="#E0E1DD"
+        android:textStyle="bold"
+        android:layout_marginBottom="5dp"/>
+
+    <FrameLayout
+        android:id="@+id/oppBoardContainer"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="#1B263B"/>
+
+</LinearLayout>

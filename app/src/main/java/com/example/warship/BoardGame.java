@@ -105,23 +105,3 @@ public class BoardGame extends View {
         arr[line][col].startExplosionAnimation(this);
     }
 }
-    public void clearAll() {
-        if (arr == null) return;
-
-        for (int i = 0; i < 9; i++) {
-            for (int j = 0; j < 9; j++) {
-                arr[i][j].clear();
-            }
-        }
-
-        invalidate();
-    }
-
-    public void setCell(int line, int col, int val) {
-        if (arr == null) return;
-        if (line < 0 || line > 8 || col < 0 || col > 8) return;
-
-        arr[line][col].forceSetVal(val);
-        invalidate();
-    }
-}

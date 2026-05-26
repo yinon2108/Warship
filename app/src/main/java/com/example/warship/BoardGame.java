@@ -10,16 +10,13 @@ import android.view.View;
 import androidx.annotation.NonNull;
 
 public class BoardGame extends View {
-
     public static final int BOARD_MY = 0;
     public static final int BOARD_OPP = 1;
-
     public Cell[][] arr;
-
     private int cellSize;
     private boolean created = false;
     private final Context context;
-    private final int boardType;
+    private final int boardType;// אישי/יריב
 
     public BoardGame(Context context, int boardType) {
         super(context);
@@ -28,7 +25,7 @@ public class BoardGame extends View {
     }
 
     @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) { // מופעל כשגודל הView נקבע
         super.onSizeChanged(w, h, oldw, oldh);
 
         int boardSize = Math.min(w, h);
@@ -84,6 +81,30 @@ public class BoardGame extends View {
         return false;
     }
 
+    public void clearAll() { // מאפס את כל הלוח
+        if (arr == null) return;
+
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 9; j++) {
+                arr[i][j].clear();
+            }
+        }
+
+        invalidate();
+    }
+
+    public void setCell(int line, int col, int val) {
+        if (arr == null) return;
+        if (line < 0 || line > 8 || col < 0 || col > 8) return;
+
+        arr[line][col].forceSetVal(val);
+        invalidate();
+    }
+    public void animateHit(int line, int col) { // מפעיל אנימציית פגיעה 🔴
+        if (arr == null) return;
+        arr[line][col].startExplosionAnimation(this);
+    }
+}
     public void clearAll() {
         if (arr == null) return;
 

@@ -1,5 +1,4 @@
 package com.example.warship;
-
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,10 +11,9 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
-
 public class GameActivity extends AppCompatActivity {
 
-    private TextView txtStatus;
+    private TextView txtStatus; // SETUP/PLAY
     private Button btnStart;
 
     private BoardGame myBoard;
@@ -138,18 +136,16 @@ public class GameActivity extends AppCompatActivity {
                 if (shotsOnMe[shot.line][shot.col] != 2) {
                     hitsOnMe++;
                 }
-
                 shotsOnMe[shot.line][shot.col] = 2;
-
-                // כאן התיקון החשוב: פגיעה עליך מוצגת כ-Hit
                 myBoard.setCell(shot.line, shot.col, Cell.Hit);
+                myBoard.animateHit(shot.line, shot.col); //הפעלת אנימציה🔴
 
             } else {
                 shotsOnMe[shot.line][shot.col] = 1;
                 myBoard.setCell(shot.line, shot.col, Cell.Miss);
             }
 
-            fb.sendShotResult(shot.seq, hit);
+            fb.sendShotResult(shot.seq, hit); //שליחת תוצאת הירייה
 
             if (hitsOnMe >= 12) {
                 gameEnded = true;
@@ -176,6 +172,7 @@ public class GameActivity extends AppCompatActivity {
                 }
 
                 myShots[pendingLine][pendingCol] = 2;
+                oppBoard.animateHit(pendingLine, pendingCol); //הפעלת אנימציה🔴
                 Toast.makeText(this, "פגעת!", Toast.LENGTH_SHORT).show();
             } else {
                 myShots[pendingLine][pendingCol] = 1;
@@ -239,7 +236,7 @@ public class GameActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onDestroy() {
+    protected void onDestroy() { // מופעל כאשר סוגרים את הActivity
         super.onDestroy();
 
         if (fb != null && mySlot != null) {
@@ -247,7 +244,7 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
-    public void onBoardReady(int boardType) {
+    public void onBoardReady(int boardType) { // מפעיל מצב setup לאחר שהלוחות נבנו
         if (boardType == BoardGame.BOARD_MY) myBoardReady = true;
         if (boardType == BoardGame.BOARD_OPP) oppBoardReady = true;
 
@@ -257,7 +254,7 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
-    public void onBoardTouch(int boardType, int line, int col) {
+    public void onBoardTouch(int boardType, int line, int col) { // מופעל כאשר לוחצים על הלוח
         if (gameEnded) return;
 
         if ("SETUP".equals(state)) {
@@ -274,7 +271,7 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
-    private void startSetup() {
+    private void startSetup() { // התחלת סידור הספינות
         ships.clear();
         selectedShip = null;
         lockSetup = false;
@@ -301,7 +298,7 @@ public class GameActivity extends AppCompatActivity {
         updateStatusText();
     }
 
-    private void handleSetupTouch(int line, int col) {
+    private void handleSetupTouch(int line, int col) { // טיפול בלחיצות בזמן סידור ספינות
         if (lockSetup) return;
 
         Ship ship = getShipByCenter(line, col);
@@ -359,7 +356,7 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
-    private void handlePlayShot(int line, int col) {
+    private void handlePlayShot(int line, int col) { // טיפול בירייה
         if (gameEnded) return;
         if (mySlot == null) return;
         if (!"PLAY".equals(state)) return;
@@ -401,7 +398,7 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
-    private void updateStatusText() {
+    private void updateStatusText() { // עדכון טקסט מצב המשחק
         if (txtStatus == null) return;
 
         if (gameEnded) return;
@@ -435,7 +432,7 @@ public class GameActivity extends AppCompatActivity {
         return null;
     }
 
-    private boolean canShipBeAt(Ship ship, int newLine, int newCol, String newOri) {
+    private boolean canShipBeAt(Ship ship, int newLine, int newCol, String newOri) { // בדיקה אם אפשר למקם ספינה
         int[][] cells;
 
         if (newOri.equals("v")) {
@@ -471,7 +468,7 @@ public class GameActivity extends AppCompatActivity {
         return true;
     }
 
-    private boolean isCellOfShip(Ship s, int line, int col) {
+    private boolean isCellOfShip(Ship s, int line, int col) { // בדיקה אם תא שייך לספינה
         if (s.centerLine == line && s.centerCol == col) {
             return true;
         }
@@ -485,7 +482,7 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
-    private boolean isHitOnMyShips(int line, int col) {
+    private boolean isHitOnMyShips(int line, int col) { // בדיקה אם ירייה פגעה בי
         for (Ship s : ships) {
             if (isCellOfShip(s, line, col)) return true;
         }

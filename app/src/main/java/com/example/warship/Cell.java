@@ -17,6 +17,8 @@ public class Cell {
     private Bitmap bitmapO;
     private int val;
     private Paint p = new Paint();
+    private float explosionRadius = 0;
+    private boolean animating = false;
 
     public Cell(int x, int y, Bitmap bitmapO, int cellWidth) {
         this.x = x;
@@ -27,9 +29,7 @@ public class Cell {
     }
 
     public void draw(Canvas canvas) {
-
-        // מסגרת התא
-        p.setStrokeWidth(6);
+        p.setStrokeWidth(6); // עובי המסגרת
         p.setStyle(Paint.Style.STROKE);
         p.setColor(Color.BLACK);
         canvas.drawRect(x, y, x + cellWidth, y + cellWidth, p);
@@ -39,29 +39,40 @@ public class Cell {
             canvas.drawBitmap(bitmapO, x + 5, y + 5, null);
         }
 
-        // 🔴 פגיעה
+        //  פגיעה
         else if (val == Hit) {
             p.setStyle(Paint.Style.FILL);
             p.setColor(Color.RED);
-            canvas.drawCircle(x + cellWidth / 2f, y + cellWidth / 2f, cellWidth / 4f, p);
+            float radius = explosionRadius;
+            if (radius == 0) {radius = cellWidth / 4f;}
+            canvas.drawCircle(x + cellWidth / 2f, y + cellWidth / 2f, radius, p);
         }
 
-        // ⚪ החטאה
+        //  החטאה
         else if (val == Miss) {
             p.setStyle(Paint.Style.FILL);
             p.setColor(Color.LTGRAY);
             canvas.drawCircle(x + cellWidth / 2f, y + cellWidth / 2f, cellWidth / 6f, p);
         }
     }
-
-    public boolean isEmpty() {
-        return val == EmptyVal;
+    public void startExplosionAnimation(BoardGame board) { //מפעיל אנימציית פיצוץ🔴
+        if (animating) return;
+        animating = true;
+        new Thread(() -> {
+            for (int i = 1; i <= 10; i++) {
+                explosionRadius = i * (cellWidth / 20f);
+                board.postInvalidate(); // ציור מחדש של הלוח
+                try {Thread.sleep(30);} catch (Exception e) {
+                }
+            }
+            explosionRadius = cellWidth / 4f;
+            board.postInvalidate(); // ציור מחדש
+            animating = false;
+        }).start();
     }
-
     public void forceSetVal(int v) {
         val = v;
     }
-
     public void clear() {
         val = EmptyVal;
     }

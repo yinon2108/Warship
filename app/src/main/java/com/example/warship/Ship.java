@@ -6,6 +6,7 @@ public class Ship {
     public String ori; // "v" / "h"
 
     public Ship() {
+        // פיירבייס דורש בנאי ריק
     }
 
     public Ship(int centerLine, int centerCol, String ori) {

@@ -1,10 +1,8 @@
 package com.example.warship;
-
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-
 public class Cell {
 
     public static final int Oval = 0;      // ספינה
@@ -58,16 +56,21 @@ public class Cell {
     public void startExplosionAnimation(BoardGame board) { //מפעיל אנימציית פיצוץ🔴
         if (animating) return;
         animating = true;
-        new Thread(() -> {
-            for (int i = 1; i <= 10; i++) {
-                explosionRadius = i * (cellWidth / 20f);
-                board.postInvalidate(); // ציור מחדש של הלוח
-                try {Thread.sleep(30);} catch (Exception e) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                for (int i = 1; i <= 10; i++) {
+                    explosionRadius = i * (cellWidth / 20f);
+                    board.postInvalidate(); // ציור מחדש של הלוח
+                    try {
+                        Thread.sleep(30);
+                    } catch (Exception e) {
+                    }
                 }
+                explosionRadius = cellWidth / 4f;
+                board.postInvalidate(); // ציור מחדש
+                animating = false;
             }
-            explosionRadius = cellWidth / 4f;
-            board.postInvalidate(); // ציור מחדש
-            animating = false;
         }).start();
     }
     public void forceSetVal(int v) {

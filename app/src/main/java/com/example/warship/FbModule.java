@@ -10,17 +10,13 @@ public class FbModule {
     private final DatabaseReference root;
     private final String myId;
     public FbModule(Context context) {
-
         FirebaseDatabase db = FirebaseDatabase.getInstance("https://warship-7e855-default-rtdb.firebaseio.com/");
-
         root = db.getReference("play");
-
         myId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
     }
     public DatabaseReference getRoot() {
         return root;
     }
-
     public String getMyId() {
         return myId;
     }
@@ -37,7 +33,7 @@ public class FbModule {
         root.child(mySlot).child("ships").setValue(ships);
         root.child(mySlot).child("ready").setValue(true);
     }
-    public void fireShot(String mySlot, int line, int col, long seq) {
+    public void fireShot(String mySlot, int line, int col, long seq) { // שליחת ירייה של השחקן לפיירבייס
         Shot shot = new Shot(mySlot, line, col, seq);
         root.child("shot").setValue(shot);
     }

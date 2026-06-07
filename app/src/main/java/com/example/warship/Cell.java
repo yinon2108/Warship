@@ -26,7 +26,7 @@ public class Cell {
         this.val = EmptyVal;
     }
 
-    public void draw(Canvas canvas) {
+    public void draw(Canvas canvas) { // ציור ועדכון כל רכיבי הלוח על המסך
         p.setStrokeWidth(6); // עובי המסגרת
         p.setStyle(Paint.Style.STROKE);
         p.setColor(Color.BLACK);
@@ -64,8 +64,8 @@ public class Cell {
                     board.postInvalidate(); // ציור מחדש של הלוח
                     try {
                         Thread.sleep(30);
-                    } catch (Exception e) {
                     }
+                    catch (Exception e) {}
                 }
                 explosionRadius = cellWidth / 4f;
                 board.postInvalidate(); // ציור מחדש

@@ -51,18 +51,19 @@ public class GameActivity extends AppCompatActivity {
         btnStart = findViewById(R.id.btnStart);
         FrameLayout myContainer = findViewById(R.id.myBoardContainer);
         FrameLayout oppContainer = findViewById(R.id.oppBoardContainer);
-        myBoard = new BoardGame(this, BoardGame.BOARD_MY);
-        oppBoard = new BoardGame(this, BoardGame.BOARD_OPP);
+        myBoard = new BoardGame(this, BoardGame.BOARD_MY); // יצירת הלוח שלי
+        oppBoard = new BoardGame(this, BoardGame.BOARD_OPP); // יצירת לוח היריב
         FrameLayout.LayoutParams params1 = new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT
                 );
         FrameLayout.LayoutParams params2 = new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT
                 );
-        myContainer.addView(myBoard, params1);
-        oppContainer.addView(oppBoard, params2);
+        myContainer.addView(myBoard, params1); // הכנסת הלוח שלי למסך
+        oppContainer.addView(oppBoard, params2);// הכנסת לוח היריב למסך
         fb = new FbModule(this);
-        fb.getRoot().addListenerForSingleValueEvent(new ValueEventListener() {
+
+        fb.getRoot().addListenerForSingleValueEvent(new ValueEventListener() { // שיוך מכשיר לp1/p2
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 String p1Id = snapshot.child("p1").child("id").getValue(String.class);
@@ -99,14 +100,12 @@ public class GameActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {}
+            public void onCancelled(@NonNull DatabaseError error) {} // מופעל במקרה של שגיאה בגישה לפיירבייס
         });
 
         fb.getRoot().child("state").addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(
-                    @NonNull DataSnapshot s
-            ) {
+            public void onDataChange(@NonNull DataSnapshot s) {
                 String newState = s.getValue(String.class);
                 if (newState == null) {
                     newState = "SETUP";
@@ -122,7 +121,6 @@ public class GameActivity extends AppCompatActivity {
                     btnStart.setEnabled(false);
                     btnStart.setText("PLAYING");
                 }
-
                 updateStatusText();
             }
 
@@ -130,7 +128,7 @@ public class GameActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {}
         });
 
-        fb.getRoot().child("currentTurn").addValueEventListener(new ValueEventListener() {
+        fb.getRoot().child("currentTurn").addValueEventListener(new ValueEventListener() { //עדכון תור המשחק
             @Override
             public void onDataChange(@NonNull DataSnapshot s) {
                 currentTurn = s.getValue(String.class);
@@ -140,7 +138,7 @@ public class GameActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {}
         });
 
-        fb.getRoot().addValueEventListener(new ValueEventListener() {
+        fb.getRoot().addValueEventListener(new ValueEventListener() { // הפעלת המשחק כאשר שני השחקנים מוכנים
             @Override
             public void onDataChange(@NonNull DataSnapshot s) {
                 Boolean r1 = s.child("p1").child("ready").getValue(Boolean.class);
@@ -167,7 +165,7 @@ public class GameActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {}
         });
 
-        fb.getRoot().child("shot").addValueEventListener(new ValueEventListener() {
+        fb.getRoot().child("shot").addValueEventListener(new ValueEventListener() { // קבלת יריות מהיריב ובדיקת פגיעה או החטאה בלוח שלי
             @Override
             public void onDataChange(@NonNull DataSnapshot s) {
                 if (gameEnded) {return;}
@@ -195,7 +193,7 @@ public class GameActivity extends AppCompatActivity {
 
                 fb.sendShotResult(shot.seq, hit);
 
-                if (hitsOnMe >= 12) {
+                if (hitsOnMe >= 12) { // האם הפסדתי
                     gameEnded = true;
                     btnStart.setText("YOU LOST");
                     txtStatus.setText("הפסדת!");
@@ -209,46 +207,47 @@ public class GameActivity extends AppCompatActivity {
             @Override
             public void onCancelled(@NonNull DatabaseError error) {}
         });
-        fb.getRoot().child("shotResult").addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot s) {
-                        if (gameEnded) return;
-                        if (pendingSeq == -1) return;
-                        FbModule.ShotResult result = s.getValue(FbModule.ShotResult.class);
-                        if (result == null) return;
-                        if (result.seq != pendingSeq) return;
 
-                        if (result.hit) {
-                            if (myShots[pendingLine][pendingCol] != 2) {
-                                hitsIHit++;
-                            }
-                            myShots[pendingLine][pendingCol] = 2;
-                            oppBoard.animateHit(pendingLine, pendingCol);
-                            Toast.makeText(GameActivity.this, "פגעת!", Toast.LENGTH_SHORT).show();
-                        }
-                        else {
-                            myShots[pendingLine][pendingCol] = 1;
-                            Toast.makeText(GameActivity.this, "החטאת!", Toast.LENGTH_SHORT).show();
-                        }
+            fb.getRoot().child("shotResult").addValueEventListener(new ValueEventListener() { //קבלת תוצאת הירייה שלי
+            @Override
+            public void onDataChange(@NonNull DataSnapshot s) {
+                if (gameEnded) return;
+                if (pendingSeq == -1) return;
+                FbModule.ShotResult result = s.getValue(FbModule.ShotResult.class);
+                if (result == null) return;
+                if (result.seq != pendingSeq) return;
 
-                        redrawOppShots();
-
-                        pendingSeq = -1;
-                        pendingLine = -1;
-                        pendingCol = -1;
-
-                        if (hitsIHit >= 12) {
-                            gameEnded = true;
-                            btnStart.setText("YOU WON");
-                            txtStatus.setText("ניצחת!");
-                            showEndDialog(true);
-                            return;
-                        }
-                        updateStatusText();
+                if (result.hit) {
+                    if (myShots[pendingLine][pendingCol] != 2) {
+                        hitsIHit++;
                     }
+                    myShots[pendingLine][pendingCol] = 2;
+                    oppBoard.animateHit(pendingLine, pendingCol);
+                    Toast.makeText(GameActivity.this, "פגעת!", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    myShots[pendingLine][pendingCol] = 1;
+                    Toast.makeText(GameActivity.this, "החטאת!", Toast.LENGTH_SHORT).show();
+                }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {}
+                redrawOppShots();
+
+                pendingSeq = -1;
+                pendingLine = -1;
+                pendingCol = -1;
+
+                if (hitsIHit >= 12) { // האם ניצחתי
+                    gameEnded = true;
+                    btnStart.setText("YOU WON");
+                    txtStatus.setText("ניצחת!");
+                    showEndDialog(true);
+                    return;
+                }
+                updateStatusText();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {}
         });
 
         btnStart.setOnClickListener(new android.view.View.OnClickListener() {
@@ -291,14 +290,14 @@ public class GameActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onDestroy() {
+    protected void onDestroy() { // ניקוי נתוני השחקן מפיירבייס בעת סגירת המסך
         super.onDestroy();
         if (fb != null && mySlot != null) {
             fb.clearMySlot(mySlot);
         }
     }
 
-    public void onBoardReady(int boardType) {
+    public void onBoardReady(int boardType) { // עדכון שBoardGame סיים להיטען והכנה לשימוש
         if (boardType == BoardGame.BOARD_MY) {myBoardReady = true;}
         if (boardType == BoardGame.BOARD_OPP) {oppBoardReady = true;}
         if (myBoardReady && oppBoardReady && !setupStarted) {
@@ -307,7 +306,7 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
-    public void onBoardTouch(int boardType, int line, int col) {
+    public void onBoardTouch(int boardType, int line, int col) { // טיפול בלחיצות על הלוח בזמן סידור הספינות או במהלך המשחק
         if (gameEnded) {return;}
         if ("SETUP".equals(state)) {
             if (boardType == BoardGame.BOARD_MY) {
@@ -322,7 +321,7 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
-    private void startSetup() {
+    private void startSetup() { // אתחול שלב סידור הספינות לפני תחילת המשחק
         ships.clear();
         selectedShip = null;
         lockSetup = false;
@@ -348,7 +347,7 @@ public class GameActivity extends AppCompatActivity {
         updateStatusText();
     }
 
-    private void handleSetupTouch(int line, int col) {
+    private void handleSetupTouch(int line, int col) { // טיפול בלחיצת המשתמש בזמן סידור הספינות
         if (lockSetup) {return;}
 
         Ship ship = getShipByCenter(line, col);
@@ -380,9 +379,9 @@ public class GameActivity extends AppCompatActivity {
             }
         }
     }
-    private void redrawMyShips() {
+    private void redrawMyShips() { // ציור מחדש של הספינות שלי על הלוח לאחר שינוי מיקום או כיוון
         myBoard.clearAll();
-        for (Ship s : ships) {
+        for (Ship s : ships) { //עבור על כל ספינה s שנמצאת ברשימת ships
             myBoard.setCell(s.centerLine, s.centerCol, Cell.Oval);
             if (s.ori.equals("v")) {
                 myBoard.setCell(s.centerLine - 1, s.centerCol, Cell.Oval);
@@ -405,7 +404,7 @@ public class GameActivity extends AppCompatActivity {
             }
         }
     }
-    private void handlePlayShot(int line, int col) {
+    private void handlePlayShot(int line, int col) { // טיפול בלחיצה של השחקן על לוח היריב
         if (gameEnded) return;
         if (mySlot == null) return;
         if (!"PLAY".equals(state)) return;
@@ -429,7 +428,7 @@ public class GameActivity extends AppCompatActivity {
         Toast.makeText(this, "ירית! מחכה לתוצאה...", Toast.LENGTH_SHORT).show();
     }
 
-    private void redrawOppShots() {
+    private void redrawOppShots() { // עדכון תצוגת היריות שבוצעו על לוח היריב
         oppBoard.clearAll();
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
@@ -438,7 +437,7 @@ public class GameActivity extends AppCompatActivity {
             }
         }
     }
-    private void updateStatusText() {
+    private void updateStatusText() { // עדכון הודעת המצב המוצגת לשחקן
         if (txtStatus == null) return;
         if (gameEnded) return;
         String text = "State: " + state;
@@ -459,15 +458,15 @@ public class GameActivity extends AppCompatActivity {
         }
         txtStatus.setText(text);
     }
-    private Ship getShipByCenter(int line, int col) {
-        for (Ship s : ships) {
+    private Ship getShipByCenter(int line, int col) { // איתור ספינה לפי תא המרכז שלה
+        for (Ship s : ships) { //עבור על כל ספינה s שנמצאת ברשימת ships
             if (s.centerLine == line && s.centerCol == col) {
                 return s;
             }
         }
         return null;
     }
-    private boolean canShipBeAt(Ship ship, int newLine, int newCol, String newOri) {
+    private boolean canShipBeAt(Ship ship, int newLine, int newCol, String newOri) { // בדיקה האם ניתן למקם ספינה במיקום ובכיוון המבוקשים
         int[][] cells;
         if (newOri.equals("v")) {
             cells = new int[][]{
@@ -483,16 +482,18 @@ public class GameActivity extends AppCompatActivity {
                     {newLine, newCol + 1}
             };
         }
-        for (int[] c : cells) {
-            if (c[0] < 0 || c[0] > 8 || c[1] < 0 || c[1] > 8) {
+        for (int[] c : cells) { //עבור על כל תא במערך דו מימדי cells, ושמור אותו כמערך חד מימדי c
+
+            if (c[0] < 0 || c[0] > 8 || c[1] < 0 || c[1] > 8) { // c[0] = שורה, c[1] = עמודה
                 return false;
             }
         }
-        for (Ship other : ships) {
-            if (other == ship) {
+        for (Ship other : ships) { //עבור על כל ספינה s שנמצאת ברשימת ships
+
+            if (other == ship) { // דילוג על הספינה הנוכחית כדי לא לבדוק התנגשות עם עצמה
                 continue;
             }
-            for (int[] c : cells) {
+            for (int[] c : cells) { //עבור על כל תא במערך דו מימדי cells, ושמור אותו כמערך חד מימדי c
                 if (isCellOfShip(other, c[0], c[1])) {
                     return false;
                 }
@@ -500,7 +501,7 @@ public class GameActivity extends AppCompatActivity {
         }
         return true;
     }
-    private boolean isCellOfShip(Ship s, int line, int col) {
+    private boolean isCellOfShip(Ship s, int line, int col) { // בדיקה האם תא מסוים שייך לספינה נתונה
         if (s.centerLine == line && s.centerCol == col) {
             return true;
         }
@@ -511,7 +512,7 @@ public class GameActivity extends AppCompatActivity {
             return (s.centerLine == line && s.centerCol - 1 == col) || (s.centerLine == line && s.centerCol + 1 == col);
         }
     }
-    private boolean isHitOnMyShips(int line, int col) {
+    private boolean isHitOnMyShips(int line, int col) { // בדיקה האם ירייה פגעה באחת מהספינות שלי
         for (Ship s : ships) {
             if (isCellOfShip(s, line, col)) {
                 return true;

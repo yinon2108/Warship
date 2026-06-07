@@ -46,14 +46,12 @@ public class BoardGame extends View {
             created = true;
             ((GameActivity) context).onBoardReady(boardType);
         }
-
         invalidate();
     }
 
     @Override
-    protected void onDraw(@NonNull Canvas canvas) {
+    protected void onDraw(@NonNull Canvas canvas) { //מופעלת כאשר צריך לצייר את ה-View על המסך
         super.onDraw(canvas);
-
         if (arr == null) return;
 
         for (int i = 0; i < 9; i++) {
@@ -74,10 +72,8 @@ public class BoardGame extends View {
             if (line >= 0 && line < 9 && col >= 0 && col < 9) {
                 ((GameActivity) context).onBoardTouch(boardType, line, col);
             }
-
             return true;
         }
-
         return false;
     }
 
@@ -89,7 +85,6 @@ public class BoardGame extends View {
                 arr[i][j].clear();
             }
         }
-
         invalidate();
     }
 
